@@ -9,8 +9,8 @@ var log = console.log;
 
 function init() {
 	console.log('Init');
-	$connectBtn.on('click', connectClick);
-	$disconnectBtn.on('click', onReconnectButtonClick);
+	$connectBtn.on('click', onScanButtonClick);
+	$disconnectBtn.on('click', onDisconnectButtonClick);
 }
 
 
@@ -32,10 +32,62 @@ function connectClick() {
 		console.log("Something went wrong. " + exception);
 	});
 
+} 
+
+function onScanButtonClick() {
+ 
+  bluetoothDevice = null;
+  log('Requesting Bluetooth Device...');
+  navigator.bluetooth.requestDevice(options)
+  .then(device => {
+    bluetoothDevice = device;
+    bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
+    return connect();
+  })
+  .catch(error => {
+    log('Argh! ' + error);
+  });
 }
 
- 
+function connect() {
+  log('Connecting to Bluetooth Device...');
+  return bluetoothDevice.gatt.connect()
+  .then(server => {
+    log('> Bluetooth Device connected');
+  });
+}
 
+function onDisconnectButtonClick() {
+  if (!bluetoothDevice) {
+    return;
+  }
+  log('Disconnecting from Bluetooth Device...');
+  if (bluetoothDevice.gatt.connected) {
+    bluetoothDevice.gatt.disconnect();
+  } else {
+    log('> Bluetooth Device is already disconnected');
+  }
+}
+
+function onDisconnected(event) {
+  // Object event.target is Bluetooth Device getting disconnected.
+  log('> Bluetooth Device disconnected');
+}
+
+
+function onReconnectButtonClick() {
+  if (!bluetoothDevice) {
+    return;
+  }
+  if (bluetoothDevice.gatt.connected) {
+    log('> Bluetooth Device is already connected');
+    return;
+  }
+  connect()
+  .catch(error => {
+    log('Argh! ' + error);
+  });
+}
 
 $(function() {
     init();
