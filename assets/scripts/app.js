@@ -4,35 +4,37 @@ var bluetoothDevice;
 var $main = $("#main");
 var $connectBtn = $("#connect");
 var $disconnectBtn = $("#disconnect");
-var options = { filters: [{ name: 'BeatsPill+' }] }
+var options = { filters: [{ name: 'BeatsPill+' }], optionalServices: ['generic_access'] }
 var log = console.log;
 
 function init() {
 	console.log('Init');
 	$connectBtn.on('click', onScanButtonClick);
 	$disconnectBtn.on('click', onDisconnectButtonClick);
+
+
 }
 
 
-function connectClick() {
+// function connectClick() {
 
-	var options = { filters: [{ name: 'BeatsPill+' }] }
+// 	var options = { filters: [{ name: 'BeatsPill+' }] }
 
-	navigator.bluetooth.requestDevice(options).then(device => {
-		console.log('Got device:', device.name);
-		console.log('id:', device.id);
-		// onsole.log('address:', device.address);
+// 	navigator.bluetooth.requestDevice(options).then(device => {
+// 		console.log('Got device:', device.name);
+// 		console.log('id:', device.id);
+// 		// onsole.log('address:', device.address);
 		
-		console.log('connected', device.gatt.connected);
-		// return device.gatt.connect();
-		// Do something with the device.
-		// return device.gatt.connect(); // Chromium 49 and below use `connectGATT()` but from Chromium 50 it will use gatt.connect();
-	})
-	.catch(exception => {
-		console.log("Something went wrong. " + exception);
-	});
+// 		console.log('connected', device.gatt.connected);
+// 		// return device.gatt.connect();
+// 		// Do something with the device.
+// 		// return device.gatt.connect(); // Chromium 49 and below use `connectGATT()` but from Chromium 50 it will use gatt.connect();
+// 	})
+// 	.catch(exception => {
+// 		console.log("Something went wrong. " + exception);
+// 	});
 
-} 
+// } 
 
 function onScanButtonClick() {
  
@@ -41,6 +43,11 @@ function onScanButtonClick() {
   navigator.bluetooth.requestDevice(options)
   .then(device => {
     bluetoothDevice = device;
+    console.log(device);
+    console.log(device.paired);
+    		console.log('Got device:', device.name);
+    		console.log('id:', device.id);
+    		console.log('uuids', device.uuids);
     bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
     return connect();
   })
